@@ -14,7 +14,7 @@ const TranslationCard = ({
   onClear,
   showActions = true 
 }) => {
-  const handleCopy = async () => {
+const handleCopy = async () => {
     if (text && text.trim()) {
       try {
         await navigator.clipboard.writeText(text);
@@ -22,6 +22,30 @@ const TranslationCard = ({
         onCopy && onCopy();
       } catch (error) {
         toast.error("Failed to copy text");
+      }
+    }
+  };
+
+  const handleSpeak = () => {
+    if (text && text.trim()) {
+      try {
+        // Check if speech synthesis is supported
+        if ('speechSynthesis' in window) {
+          // Cancel any ongoing speech
+          window.speechSynthesis.cancel();
+          
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.rate = 0.8;
+          utterance.pitch = 1;
+          utterance.volume = 1;
+          
+          window.speechSynthesis.speak(utterance);
+          toast.success("Speaking text...");
+        } else {
+          toast.error("Text-to-speech not supported in your browser");
+        }
+      } catch (error) {
+        toast.error("Failed to speak text");
       }
     }
   };
@@ -41,7 +65,18 @@ const TranslationCard = ({
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
             {showActions && (
-              <div className="flex gap-2">
+<div className="flex gap-2">
+                {isOutput && text && text.trim() && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSpeak}
+                    className="h-8 px-3"
+                    title="Listen to pronunciation"
+                  >
+                    <ApperIcon name="Volume2" className="h-4 w-4" />
+                  </Button>
+                )}
                 {text && text.trim() && (
                   <Button
                     variant="outline"
