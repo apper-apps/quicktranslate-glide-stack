@@ -1,8 +1,9 @@
-import translationsData from "@/services/mockData/translations.json";
-
 class TranslationService {
   constructor() {
-    this.translations = [...translationsData];
+    this.tableName = 'translation_c';
+    this.apperClient = null;
+    this.initializeClient();
+    // Keep mock translation logic for translation functionality
     this.mockTranslations = {
       "en-es": {
         "hello": "hola",
@@ -83,13 +84,15 @@ class TranslationService {
     };
   }
 
-  async delay() {
-    await new Promise(resolve => setTimeout(resolve, 500));
+  initializeClient() {
+    const { ApperClient } = window.ApperSDK;
+    this.apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
   }
 
   async translate(text, sourceLang, targetLang) {
-    await this.delay();
-    
     if (!text || !text.trim()) {
       throw new Error("Text is required for translation");
     }
@@ -117,17 +120,34 @@ class TranslationService {
       translatedText = this.generateMockTranslation(text, targetLang);
     }
 
-    const translation = {
-      Id: this.getNextId(),
-      sourceText: text,
-      translatedText: translatedText,
-      sourceLang: sourceLang,
-      targetLang: targetLang,
-      timestamp: new Date().toISOString()
-    };
+    // Save translation to database
+    try {
+      const savedTranslation = await this.create({
+        sourceText: text,
+        translatedText: translatedText,
+        sourceLang: sourceLang,
+        targetLang: targetLang
+      });
 
-    this.translations.push(translation);
-    return { ...translation };
+      return {
+        Id: savedTranslation.Id,
+        sourceText: savedTranslation.sourceText,
+        translatedText: savedTranslation.translatedText,
+        sourceLang: savedTranslation.sourceLang,
+        targetLang: savedTranslation.targetLang,
+        timestamp: savedTranslation.timestamp
+      };
+    } catch (error) {
+      // If database save fails, still return the translation
+      console.error("Failed to save translation to database:", error.message);
+      return {
+        sourceText: text,
+        translatedText: translatedText,
+        sourceLang: sourceLang,
+        targetLang: targetLang,
+        timestamp: new Date().toISOString()
+      };
+    }
   }
 
   generateMockTranslation(text, targetLang) {
@@ -156,57 +176,250 @@ class TranslationService {
     return `${prefixes[targetLang] || "[TRANSLATED] "}${text}`;
   }
 
-  getNextId() {
-    const maxId = this.translations.length > 0 
-      ? Math.max(...this.translations.map(t => t.Id)) 
-      : 0;
-    return maxId + 1;
-  }
-
   async getAll() {
-    await this.delay();
-    return [...this.translations];
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "source_text_c" } },
+          { field: { Name: "translated_text_c" } },
+          { field: { Name: "source_lang_c" } },
+          { field: { Name: "target_lang_c" } },
+          { field: { Name: "timestamp_c" } }
+        ],
+        orderBy: [
+          { fieldName: "timestamp_c", sorttype: "DESC" }
+        ]
+      };
+
+      const response = await this.apperClient.fetchRecords(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      // Map database fields to UI expected format
+      const translations = (response.data || []).map(trans => ({
+        Id: trans.Id,
+        sourceText: trans.source_text_c,
+        translatedText: trans.translated_text_c,
+        sourceLang: trans.source_lang_c,
+        targetLang: trans.target_lang_c,
+        timestamp: trans.timestamp_c
+      }));
+
+      return translations;
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching translations:", error?.response?.data?.message);
+        throw new Error(error?.response?.data?.message);
+      } else {
+        console.error("Error fetching translations:", error.message);
+        throw new Error(error.message);
+      }
+    }
   }
 
   async getById(id) {
-    await this.delay();
-    const translation = this.translations.find(t => t.Id === parseInt(id));
-    if (!translation) {
-      throw new Error("Translation not found");
+    try {
+      const params = {
+        fields: [
+          { field: { Name: "Name" } },
+          { field: { Name: "source_text_c" } },
+          { field: { Name: "translated_text_c" } },
+          { field: { Name: "source_lang_c" } },
+          { field: { Name: "target_lang_c" } },
+          { field: { Name: "timestamp_c" } }
+        ]
+      };
+
+      const response = await this.apperClient.getRecordById(this.tableName, id, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (!response.data) {
+        throw new Error("Translation not found");
+      }
+
+      // Map database fields to UI expected format
+      return {
+        Id: response.data.Id,
+        sourceText: response.data.source_text_c,
+        translatedText: response.data.translated_text_c,
+        sourceLang: response.data.source_lang_c,
+        targetLang: response.data.target_lang_c,
+        timestamp: response.data.timestamp_c
+      };
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error fetching translation by ID:", error?.response?.data?.message);
+        throw new Error(error?.response?.data?.message);
+      } else {
+        console.error("Error fetching translation by ID:", error.message);
+        throw new Error(error.message);
+      }
     }
-    return { ...translation };
   }
 
   async create(translationData) {
-    await this.delay();
-    const newTranslation = {
-      Id: this.getNextId(),
-      timestamp: new Date().toISOString(),
-      ...translationData
-    };
-    this.translations.push(newTranslation);
-    return { ...newTranslation };
+    try {
+      // Map UI fields to database fields, only Updateable fields
+      const params = {
+        records: [{
+          Name: translationData.sourceText || "Translation",
+          source_text_c: translationData.sourceText,
+          translated_text_c: translationData.translatedText,
+          source_lang_c: translationData.sourceLang,
+          target_lang_c: translationData.targetLang,
+          timestamp_c: new Date().toISOString()
+        }]
+      };
+
+      const response = await this.apperClient.createRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulRecords = response.results.filter(result => result.success);
+        const failedRecords = response.results.filter(result => !result.success);
+        
+        if (failedRecords.length > 0) {
+          console.error(`Failed to create translation ${failedRecords.length} records:${JSON.stringify(failedRecords)}`);
+          
+          failedRecords.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        if (successfulRecords.length > 0) {
+          const result = successfulRecords[0].data;
+          return {
+            Id: result.Id,
+            sourceText: result.source_text_c,
+            translatedText: result.translated_text_c,
+            sourceLang: result.source_lang_c,
+            targetLang: result.target_lang_c,
+            timestamp: result.timestamp_c
+          };
+        }
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error creating translation:", error?.response?.data?.message);
+        throw new Error(error?.response?.data?.message);
+      } else {
+        console.error("Error creating translation:", error.message);
+        throw new Error(error.message);
+      }
+    }
   }
 
   async update(id, translationData) {
-    await this.delay();
-    const index = this.translations.findIndex(t => t.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Translation not found");
+    try {
+      // Map UI fields to database fields, only Updateable fields
+      const params = {
+        records: [{
+          Id: parseInt(id),
+          Name: translationData.sourceText || "Translation",
+          source_text_c: translationData.sourceText,
+          translated_text_c: translationData.translatedText,
+          source_lang_c: translationData.sourceLang,
+          target_lang_c: translationData.targetLang,
+          timestamp_c: translationData.timestamp || new Date().toISOString()
+        }]
+      };
+
+      const response = await this.apperClient.updateRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulUpdates = response.results.filter(result => result.success);
+        const failedUpdates = response.results.filter(result => !result.success);
+        
+        if (failedUpdates.length > 0) {
+          console.error(`Failed to update translation ${failedUpdates.length} records:${JSON.stringify(failedUpdates)}`);
+          
+          failedUpdates.forEach(record => {
+            record.errors?.forEach(error => {
+              throw new Error(`${error.fieldLabel}: ${error.message}`);
+            });
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        if (successfulUpdates.length > 0) {
+          const result = successfulUpdates[0].data;
+          return {
+            Id: result.Id,
+            sourceText: result.source_text_c,
+            translatedText: result.translated_text_c,
+            sourceLang: result.source_lang_c,
+            targetLang: result.target_lang_c,
+            timestamp: result.timestamp_c
+          };
+        }
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error updating translation:", error?.response?.data?.message);
+        throw new Error(error?.response?.data?.message);
+      } else {
+        console.error("Error updating translation:", error.message);
+        throw new Error(error.message);
+      }
     }
-    this.translations[index] = { ...this.translations[index], ...translationData };
-    return { ...this.translations[index] };
   }
 
   async delete(id) {
-    await this.delay();
-    const index = this.translations.findIndex(t => t.Id === parseInt(id));
-    if (index === -1) {
-      throw new Error("Translation not found");
+    try {
+      const params = {
+        RecordIds: [parseInt(id)]
+      };
+
+      const response = await this.apperClient.deleteRecord(this.tableName, params);
+      
+      if (!response.success) {
+        console.error(response.message);
+        throw new Error(response.message);
+      }
+
+      if (response.results) {
+        const successfulDeletions = response.results.filter(result => result.success);
+        const failedDeletions = response.results.filter(result => !result.success);
+        
+        if (failedDeletions.length > 0) {
+          console.error(`Failed to delete translation ${failedDeletions.length} records:${JSON.stringify(failedDeletions)}`);
+          
+          failedDeletions.forEach(record => {
+            if (record.message) throw new Error(record.message);
+          });
+        }
+        
+        return successfulDeletions.length > 0;
+      }
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        console.error("Error deleting translation:", error?.response?.data?.message);
+        throw new Error(error?.response?.data?.message);
+      } else {
+        console.error("Error deleting translation:", error.message);
+        throw new Error(error.message);
+      }
     }
-    const deletedTranslation = { ...this.translations[index] };
-    this.translations.splice(index, 1);
-    return deletedTranslation;
   }
 }
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from 'react-redux';
 import TranslationForm from "@/components/organisms/TranslationForm";
 import Loading from "@/components/ui/Loading";
 import Error from "@/components/ui/Error";
@@ -6,7 +7,6 @@ import Empty from "@/components/ui/Empty";
 import { toast } from "react-toastify";
 import translationService from "@/services/api/translationService";
 import languageService from "@/services/api/languageService";
-
 const TranslatePage = () => {
   const [inputText, setInputText] = useState("");
   const [outputText, setOutputText] = useState("");
@@ -34,11 +34,15 @@ const TranslatePage = () => {
     loadLanguages();
   }, []);
 
-  const loadLanguages = async () => {
+const loadLanguages = async () => {
     try {
       setError("");
       const data = await languageService.getAll();
-      setLanguages(data);
+      // Add auto-detect option if not present
+      const languageOptions = data.find(l => l.code === "auto") 
+        ? data 
+        : [{ Id: 0, code: "auto", name: "Auto-detect", nativeName: "Auto-detect", flag: "🌐" }, ...data];
+      setLanguages(languageOptions);
     } catch (err) {
       setError("Failed to load languages");
       toast.error("Failed to load languages");
@@ -62,7 +66,7 @@ const TranslatePage = () => {
     setError("");
 
     try {
-      const result = await translationService.translate(
+const result = await translationService.translate(
         inputText.trim(),
         sourceLanguage,
         targetLanguage
