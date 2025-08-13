@@ -1,0 +1,20 @@
+[
+  {
+    "Id": 1,
+    "translationId": "1",
+    "category": "Common Phrases",
+    "addedAt": "2024-01-15T10:35:00.000Z"
+  },
+  {
+    "Id": 2,
+    "translationId": "2",
+    "category": "Greetings",
+    "addedAt": "2024-01-15T09:20:00.000Z"
+  },
+  {
+    "Id": 3,
+    "translationId": "3",
+    "category": "Courtesy",
+    "addedAt": "2024-01-15T14:50:00.000Z"
+  }
+]

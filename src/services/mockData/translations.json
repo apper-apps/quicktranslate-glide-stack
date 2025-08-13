@@ -1,0 +1,42 @@
+[
+  {
+    "Id": 1,
+    "sourceText": "Hello, how are you?",
+    "translatedText": "Hola, ¿cómo estás?",
+    "sourceLang": "en",
+    "targetLang": "es",
+    "timestamp": "2024-01-15T10:30:00.000Z"
+  },
+  {
+    "Id": 2,
+    "sourceText": "Good morning",
+    "translatedText": "Bonjour",
+    "sourceLang": "en",
+    "targetLang": "fr",
+    "timestamp": "2024-01-15T09:15:00.000Z"
+  },
+  {
+    "Id": 3,
+    "sourceText": "Thank you very much",
+    "translatedText": "Vielen Dank",
+    "sourceLang": "en",
+    "targetLang": "de",
+    "timestamp": "2024-01-15T14:45:00.000Z"
+  },
+  {
+    "Id": 4,
+    "sourceText": "Where is the bathroom?",
+    "translatedText": "Dove è il bagno?",
+    "sourceLang": "en",
+    "targetLang": "it",
+    "timestamp": "2024-01-15T16:20:00.000Z"
+  },
+  {
+    "Id": 5,
+    "sourceText": "I don't understand",
+    "translatedText": "Eu não entendo",
+    "sourceLang": "en",
+    "targetLang": "pt",
+    "timestamp": "2024-01-15T11:30:00.000Z"
+  }
+]

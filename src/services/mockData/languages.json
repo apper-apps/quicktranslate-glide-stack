@@ -1,0 +1,142 @@
+[
+  {
+    "Id": 1,
+    "code": "auto",
+    "name": "Auto-detect",
+    "nativeName": "Auto-detect",
+    "flag": "🌐"
+  },
+  {
+    "Id": 2,
+    "code": "en",
+    "name": "English",
+    "nativeName": "English",
+    "flag": "🇺🇸"
+  },
+  {
+    "Id": 3,
+    "code": "es",
+    "name": "Spanish",
+    "nativeName": "Español",
+    "flag": "🇪🇸"
+  },
+  {
+    "Id": 4,
+    "code": "fr",
+    "name": "French",
+    "nativeName": "Français",
+    "flag": "🇫🇷"
+  },
+  {
+    "Id": 5,
+    "code": "de",
+    "name": "German",
+    "nativeName": "Deutsch",
+    "flag": "🇩🇪"
+  },
+  {
+    "Id": 6,
+    "code": "it",
+    "name": "Italian",
+    "nativeName": "Italiano",
+    "flag": "🇮🇹"
+  },
+  {
+    "Id": 7,
+    "code": "pt",
+    "name": "Portuguese",
+    "nativeName": "Português",
+    "flag": "🇵🇹"
+  },
+  {
+    "Id": 8,
+    "code": "ru",
+    "name": "Russian",
+    "nativeName": "Русский",
+    "flag": "🇷🇺"
+  },
+  {
+    "Id": 9,
+    "code": "ja",
+    "name": "Japanese",
+    "nativeName": "日本語",
+    "flag": "🇯🇵"
+  },
+  {
+    "Id": 10,
+    "code": "ko",
+    "name": "Korean",
+    "nativeName": "한국어",
+    "flag": "🇰🇷"
+  },
+  {
+    "Id": 11,
+    "code": "zh",
+    "name": "Chinese",
+    "nativeName": "中文",
+    "flag": "🇨🇳"
+  },
+  {
+    "Id": 12,
+    "code": "ar",
+    "name": "Arabic",
+    "nativeName": "العربية",
+    "flag": "🇸🇦"
+  },
+  {
+    "Id": 13,
+    "code": "hi",
+    "name": "Hindi",
+    "nativeName": "हिन्दी",
+    "flag": "🇮🇳"
+  },
+  {
+    "Id": 14,
+    "code": "tr",
+    "name": "Turkish",
+    "nativeName": "Türkçe",
+    "flag": "🇹🇷"
+  },
+  {
+    "Id": 15,
+    "code": "nl",
+    "name": "Dutch",
+    "nativeName": "Nederlands",
+    "flag": "🇳🇱"
+  },
+  {
+    "Id": 16,
+    "code": "pl",
+    "name": "Polish",
+    "nativeName": "Polski",
+    "flag": "🇵🇱"
+  },
+  {
+    "Id": 17,
+    "code": "sv",
+    "name": "Swedish",
+    "nativeName": "Svenska",
+    "flag": "🇸🇪"
+  },
+  {
+    "Id": 18,
+    "code": "da",
+    "name": "Danish",
+    "nativeName": "Dansk",
+    "flag": "🇩🇰"
+  },
+  {
+    "Id": 19,
+    "code": "no",
+    "name": "Norwegian",
+    "nativeName": "Norsk",
+    "flag": "🇳🇴"
+  },
+  {
+    "Id": 20,
+    "code": "fi",
+    "name": "Finnish",
+    "nativeName": "Suomi",
+    "flag": "🇫🇮"
+  }
+]
