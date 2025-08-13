@@ -4,8 +4,8 @@ import LanguageSelector from "@/components/molecules/LanguageSelector";
 import ActionButtons from "@/components/molecules/ActionButtons";
 import TranslationCard from "@/components/molecules/TranslationCard";
 import QuickPhrases from "@/components/molecules/QuickPhrases";
+import SpeechRecognizer from "@/components/atoms/SpeechRecognizer";
 import { motion } from "framer-motion";
-
 const TranslationForm = ({
   inputText,
   setInputText,
@@ -75,14 +75,20 @@ const TranslationForm = ({
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Enter text to translate
-            </label>
+<div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Enter text to translate
+              </label>
+              <SpeechRecognizer 
+                onTextReceived={(text) => setInputText(prev => prev ? `${prev} ${text}` : text)}
+                className="ml-2"
+              />
+            </div>
             <Textarea
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Type your text here..."
+              placeholder="Type your text here or use voice input..."
               className="min-h-[200px] text-base"
             />
           </div>
